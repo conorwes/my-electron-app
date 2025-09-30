@@ -1,7 +1,12 @@
 import { expect } from "@playwright/test";
 import { electronTest as test } from "../playwrightUtilities";
 
+// These tests were generated using codegen as examples
+
 test.describe('codegen tests', () => {
+
+    // the beforeEach and afterEach methods were manually copied from basic.e2e.ts to enable tracing
+
     test.beforeEach(async ({page, trace}) => {
         // for now, manual tracing is required. see https://github.com/microsoft/playwright/issues/8208
         if (trace)
@@ -62,5 +67,12 @@ test.describe('codegen tests', () => {
       await expect(page.locator('body')).toContainText('Text Entry:');
       await expect(page.locator('body')).toContainText('Click Me, I\'m Green!');
       await expect(page.locator('body')).toContainText('Green');
+    });
+
+    test('equality tests', async ({ page }) => {
+        await expect(page.getByRole('textbox')).toBeEmpty();
+        await page.getByRole('textbox').click();
+        await page.getByRole('textbox').fill('Hello, world!');
+        await expect(page.getByRole('textbox')).toHaveValue('Hello, world!');
     });
 });

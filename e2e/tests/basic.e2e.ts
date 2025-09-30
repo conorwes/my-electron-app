@@ -1,6 +1,8 @@
 import { expect } from "@playwright/test";
 import { convertHexToRGB, electronTest as test } from "../playwrightUtilities";
 
+// These tests were generated manually
+
 test.describe('basic tests', () => {
     test.beforeEach(async ({page, trace}) => {
         // for now, manual tracing is required. see https://github.com/microsoft/playwright/issues/8208
