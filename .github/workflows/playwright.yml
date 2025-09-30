@@ -7,10 +7,12 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: windows-latest
+    # comment out the matrix strategy until I can disambiguate artifacts and investigate linux issues
+    #runs-on: ${{ matrix.os }}
+    #strategy:
+    #  matrix:
+    #    os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
