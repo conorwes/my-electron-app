@@ -31,11 +31,11 @@ jobs:
       run: npm install
     - name: Ubuntu specific steps
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: | 
-        echo: "Running Ubuntu specific commands..."
+      run: |
+        echo "Running Ubuntu specific commands..."
         sudo chown root chrome-sandbox
         sudo chmod 4755 chrome-sandbox
-        echo: "Finished running commands."
+        echo "Finished running commands."
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4
