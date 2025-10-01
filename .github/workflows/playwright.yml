@@ -7,12 +7,19 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: windows-latest
-    # comment out the matrix strategy until I can disambiguate artifacts and investigate linux issues
-    #runs-on: ${{ matrix.os }}
-    #strategy:
-    #  matrix:
-    #    os: [ubuntu-latest, windows-latest, macos-latest]
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: ${{ github.event.repository.name }}
+            asset_name: ${{ github.event.repository.name }}-ubuntu
+          - os: windows-latest
+            artifact_name: ${{ github.event.repository.name }}
+            asset_name: ${{ github.event.repository.name }}-windows
+          - os: macos-latest
+            artifact_name: ${{ github.event.repository.name }}
+            asset_name: ${{ github.event.repository.name }}-macos
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -20,8 +27,6 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm install
-    #- name: Make the executable
-    #  run: npm run make
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4
