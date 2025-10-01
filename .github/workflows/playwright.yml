@@ -6,7 +6,8 @@ on:
     branches: [ main, master ]
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 30
+    # use a strategy to test all 3 runners with 1 job
     strategy:
       matrix:
         include:
@@ -19,8 +20,12 @@ jobs:
           - os: macos-latest
             artifact_name: ${{ github.event.repository.name }}
             asset_name: ${{ github.event.repository.name }}-macos
+      # fail-fast is required to allow 1+ component(s) of the job to fail 
+      # but not block the other runner(s)
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    # continue-on-error is also required for supporting failure which does
+    # not kill the other runners
     continue-on-error: true
     steps:
     - uses: actions/checkout@v4
@@ -29,20 +34,28 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm install
-    - name: Ubuntu specific steps
+    # Ubuntu is a bit more complex, so we need to do some special steps
+    - name: Run Playwright tests (Ubuntu)
       if: ${{ matrix.os == 'ubuntu-latest' }}
+      # 1. Ubuntu 24.04+ has a stricter security model through AppArmor, which
+      # prevents chrome-sandbox from running, which we need for electron.
+      # See https://github.com/electron/electron/issues/42510
+      # 2. GitHub Actions by default use headless machines, so we need to use
+      # xvfb to simulate a display
       run: |
         echo "Running Ubuntu specific commands..."
         sudo chown root ./node_modules/electron/dist/chrome-sandbox
         sudo chmod 4755 ./node_modules/electron/dist/chrome-sandbox
         xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npx playwright test
         echo "Finished running commands."
-    - name: Run Playwright tests
+    # Otherwise, we can just use the default command
+    - name: Run Playwright tests (MacOS/Windows)
       if: ${{ matrix.os != 'ubuntu-latest' }}
       run: npx playwright test
+    # Finally upload the artifacts
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         name: playwright-report-${{ matrix.os }}
         path: playwright-report/
-        retention-days: 30
+        retention-days: 7
