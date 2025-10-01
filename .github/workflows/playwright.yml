@@ -44,5 +44,5 @@ jobs:
       if: ${{ !cancelled() }}
       with:
         name: playwright-report-${{ matrix.os }}
-        path: ./output/
+        path: playwright-report/
         retention-days: 30
